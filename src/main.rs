@@ -1,5 +1,6 @@
 use frug;
 use math;
+use rand::Rng;
 
 #[derive(PartialEq)]
 enum Transition {
@@ -74,6 +75,18 @@ fn main() {
     let grass_h = 240.0 / window_h * grass_scale;
     let grass_repeats = math::round::ceil((2.0 / grass_w) as f64, 0) as i32;
 
+    // clouds
+    let cloud_tex_idx = frug_instance.load_texture(include_bytes!("img/cloud1.png"));
+    let cloud_w = 260.0 / window_w;
+    let cloud_h = 130.0 / window_h;
+    let clouds_y = (0.7, 1.05);
+    let mut clouds_data: Vec<[f32; 4]> = Vec::new();
+    let clouds_time = (150, 250);
+    let mut clouds_timer = rand::thread_rng().gen_range(clouds_time.0..clouds_time.1);
+    let clouds_scale = (0.85, 1.25);
+    let clouds_speed = (0.001, 0.003);
+    let mut clouds_to_delete: Vec<usize> = Vec::new();
+
     let update_function = move |instance: &mut frug::FrugInstance, input: &frug::InputHelper| {
         // ****     LOGIC   ****
 
@@ -113,6 +126,41 @@ fn main() {
             }
         }
 
+        // update clouds data
+        //      create clouds
+        clouds_timer -= 1;
+        if clouds_timer <= 0 {
+            clouds_timer = rand::thread_rng().gen_range(clouds_time.0..clouds_time.1);
+
+            clouds_data.push([
+                1.0,                                                          // x
+                rand::thread_rng().gen_range(clouds_y.0..clouds_y.1),         // y
+                rand::thread_rng().gen_range(clouds_scale.0..clouds_scale.1), // scale
+                rand::thread_rng().gen_range(clouds_speed.0..clouds_speed.1), // speed
+            ]);
+        }
+        //      move clouds & check if should delete them
+        for i in 0..clouds_data.len() {
+            clouds_data[i][0] -= clouds_data[i][3];
+
+            if clouds_data[i][0] + (clouds_data[i][2] * cloud_w) < -1.0 {
+                clouds_to_delete.push(i);
+            }
+        }
+        //      delete clouds
+        /*if clouds_to_delete.len() > 0 {
+            for i in clouds_to_delete.iter().rev() {
+                clouds_data.remove(*i);
+                println!("removed cloud");
+            }
+        }*/
+        for i in (0..clouds_to_delete.len()).rev() {
+            println!("{}", clouds_to_delete[i]);
+            clouds_data.remove(clouds_to_delete[i]);
+            println!("removed cloud");
+        }
+        clouds_to_delete.clear();
+
         // ****     INPUT   ****
         if input.key_pressed(frug::VirtualKeyCode::Right) {
             // advance
@@ -130,6 +178,19 @@ fn main() {
 
         // render if not in full transition
         if transition != Transition::Full {
+            // render clouds
+            for cloud in clouds_data.iter() {
+                instance.add_tex_rect(
+                    cloud[0],
+                    cloud[1],
+                    cloud_w * cloud[2],
+                    cloud_h * cloud[2],
+                    cloud_tex_idx,
+                    false,
+                    false,
+                );
+            }
+
             // render grass
             for i in 0..grass_repeats {
                 instance.add_tex_rect(
