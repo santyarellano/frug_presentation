@@ -87,6 +87,13 @@ fn main() {
     let clouds_speed = (0.001, 0.003);
     let mut clouds_to_delete: Vec<usize> = Vec::new();
 
+    // mountain
+    let mount_tex_idx = frug_instance.load_texture(include_bytes!("img/mountain.png"));
+    let mount_scale = 1.0;
+    let mount_w = 640.0 / window_w;
+    let mount_h = 400.0 / window_h;
+
+    // update function
     let update_function = move |instance: &mut frug::FrugInstance, input: &frug::InputHelper| {
         // ****     LOGIC   ****
 
@@ -170,6 +177,17 @@ fn main() {
 
         // render if not in full transition
         if transition != Transition::Full {
+            // render mountains
+            instance.add_tex_rect(
+                -1.0,
+                -1.0 + grass_h + mount_h,
+                mount_w,
+                mount_h,
+                mount_tex_idx,
+                false,
+                false,
+            );
+
             // render clouds
             for cloud in clouds_data.iter() {
                 instance.add_tex_rect(
