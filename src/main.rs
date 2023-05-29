@@ -148,16 +148,8 @@ fn main() {
             }
         }
         //      delete clouds
-        /*if clouds_to_delete.len() > 0 {
-            for i in clouds_to_delete.iter().rev() {
-                clouds_data.remove(*i);
-                println!("removed cloud");
-            }
-        }*/
         for i in (0..clouds_to_delete.len()).rev() {
-            println!("{}", clouds_to_delete[i]);
             clouds_data.remove(clouds_to_delete[i]);
-            println!("removed cloud");
         }
         clouds_to_delete.clear();
 
