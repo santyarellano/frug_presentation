@@ -20,6 +20,12 @@ fn main() {
     let window_h = 800.0;
     frug_instance.set_window_size(window_w, window_h);
 
+    // Text images
+    let frug_title_idx = frug_instance.load_texture(include_bytes!("img/frug_title.png"));
+    let frug_title_scale = 1.0;
+    let frug_title_w = 1155.0 / window_w * frug_title_scale;
+    let frug_title_h = 376.0 / window_w * frug_title_scale;
+
     // transition data
     let tborder_tex_idx =
         frug_instance.load_texture(include_bytes!("img/frug_transition_border.png"));
@@ -143,8 +149,9 @@ fn main() {
             }
         }
 
-        // render transition borders
+        // render transition borders & text
         if transition != Transition::None {
+            // borders
             for i in 0..tborder_repeats {
                 // upper border
                 instance.add_tex_rect(
@@ -168,6 +175,17 @@ fn main() {
                     true,
                 );
             }
+
+            // frug title
+            instance.add_tex_rect(
+                0.0 - frug_title_w / 2.0,
+                1.0 - transition_height + 0.65,
+                frug_title_w,
+                frug_title_h,
+                frug_title_idx,
+                false,
+                false,
+            )
         }
 
         instance.update_buffers();
