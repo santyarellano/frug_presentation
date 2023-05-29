@@ -1,4 +1,5 @@
 use frug;
+use math;
 
 #[derive(PartialEq)]
 enum Transition {
@@ -12,7 +13,7 @@ fn main() {
     let (mut frug_instance, event_loop) = frug::new("My Window");
 
     // setup
-    frug_instance.set_background_color(frug::create_color(0.3, 0.3, 1.0, 1.0));
+    frug_instance.set_background_color(frug::create_color(0.205, 0.39, 1.0, 1.0));
 
     // window data
     let window_w = 1000.0;
@@ -20,10 +21,16 @@ fn main() {
     frug_instance.set_window_size(window_w, window_h);
 
     // transition data
+    let tborder_tex_idx =
+        frug_instance.load_texture(include_bytes!("img/frug_transition_border.png"));
+    let tborder_scale = 1.5;
+    let tborder_w = 160.0 / window_w * tborder_scale;
+    let tborder_h = 70.0 / window_h * tborder_scale;
+    let tborder_repeats = math::round::ceil((2.0 / tborder_w) as f64, 0) as i32;
     let mut transition = Transition::Full;
-    let transition_color = [0.0, 0.0, 0.0];
+    let transition_color = [0.131, 0.027, 0.033];
     let transition_speed: f32 = 0.02;
-    let mut transition_height = 0.0;
+    let mut transition_height = 1.0;
 
     // slides data
     let slide = 0;
@@ -114,7 +121,7 @@ fn main() {
             instance.add_tex_rect(-0.7, -0.2, frogo_w, frogo_h, frogo_tex_idx, false, false);
         }
 
-        // render transition
+        // render transition squares
         match transition {
             Transition::Full => {
                 instance.add_colored_rect(-1.0, 1.0, 2.0, 2.0, transition_color);
@@ -132,6 +139,33 @@ fn main() {
                     2.0,
                     transition_height,
                     transition_color,
+                );
+            }
+        }
+
+        // render transition borders
+        if transition != Transition::None {
+            for i in 0..tborder_repeats {
+                // upper border
+                instance.add_tex_rect(
+                    -1.0 + tborder_w * (i) as f32,
+                    1.0 - transition_height + tborder_h,
+                    tborder_w,
+                    tborder_h,
+                    tborder_tex_idx,
+                    false,
+                    false,
+                );
+
+                // lower border
+                instance.add_tex_rect(
+                    -1.0 + tborder_w * (i) as f32,
+                    -1.0 + transition_height,
+                    tborder_w,
+                    tborder_h,
+                    tborder_tex_idx,
+                    false,
+                    true,
                 );
             }
         }
