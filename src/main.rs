@@ -67,6 +67,13 @@ fn main() {
     let mut frogo_tex_loc = 0;
     let mut frogo_tex_idx = frogo_idle[frogo_tex_loc];
 
+    // grass
+    let grass_tex_idx = frug_instance.load_texture(include_bytes!("img/grass.png"));
+    let grass_scale = 1.5;
+    let grass_w = 160.0 / window_w * grass_scale;
+    let grass_h = 240.0 / window_h * grass_scale;
+    let grass_repeats = math::round::ceil((2.0 / grass_w) as f64, 0) as i32;
+
     let update_function = move |instance: &mut frug::FrugInstance, input: &frug::InputHelper| {
         // ****     LOGIC   ****
 
@@ -123,8 +130,29 @@ fn main() {
 
         // render if not in full transition
         if transition != Transition::Full {
+            // render grass
+            for i in 0..grass_repeats {
+                instance.add_tex_rect(
+                    -1.0 + grass_w * i as f32,
+                    -1.0 + grass_h,
+                    grass_w,
+                    grass_h,
+                    grass_tex_idx,
+                    i % 2 == 0,
+                    false,
+                );
+            }
+
             // render frogo
-            instance.add_tex_rect(-0.7, -0.2, frogo_w, frogo_h, frogo_tex_idx, false, false);
+            instance.add_tex_rect(
+                -0.85,
+                -1.04 + grass_h + frogo_h,
+                frogo_w,
+                frogo_h,
+                frogo_tex_idx,
+                false,
+                false,
+            );
         }
 
         // render transition squares
