@@ -96,7 +96,7 @@ fn main() {
     let frogo_w = frogo_size / window_w;
     let frogo_h = frogo_size / window_h;
     let frogo_idle_spd = 5;
-    let frogo_walk_spd = 8;
+    let frogo_walk_spd = 10;
     let mut frogo_is_idle = true;
     let mut frogo_tex_timer = frogo_idle_spd;
     let mut frogo_tex_loc = 0;
@@ -290,6 +290,18 @@ fn main() {
 
                 frogo_tex_idx = frogo_walk[frogo_tex_loc];
             }
+        }
+        // set frogo walk animation or idle based on transition speed
+        if frogo_is_idle && slide_transition_speed != 0.0 {
+            frogo_is_idle = false;
+            frogo_tex_loc = 0;
+            frogo_tex_idx = frogo_walk[frogo_tex_loc];
+            frogo_tex_timer = frogo_walk_spd;
+        } else if !frogo_is_idle && slide_transition_speed == 0.0 {
+            frogo_is_idle = true;
+            frogo_tex_loc = 0;
+            frogo_tex_idx = frogo_idle[frogo_tex_loc];
+            frogo_tex_timer = frogo_idle_spd;
         }
 
         // update clouds data
