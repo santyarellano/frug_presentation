@@ -21,6 +21,37 @@ fn main() {
     let window_h = 800.0;
     frug_instance.set_window_size(window_w, window_h);
 
+    // gradient background
+    let top_bkg_color = [0.205, 0.39, 1.0];
+    let bottom_bkg_color = [0.55, 0.55, 1.0];
+    let background = [
+        frug::Vertex {
+            // top left
+            position: [-1.0, 1.0, 0.0],
+            color: top_bkg_color,
+            ..Default::default()
+        },
+        frug::Vertex {
+            // bottom left
+            position: [-1.0, -1.0, 0.0],
+            color: bottom_bkg_color,
+            ..Default::default()
+        },
+        frug::Vertex {
+            // bottom right
+            position: [1.0, -1.0, 0.0],
+            color: bottom_bkg_color,
+            ..Default::default()
+        },
+        frug::Vertex {
+            // top right
+            position: [1.0, 1.0, 0.0],
+            color: top_bkg_color,
+            ..Default::default()
+        },
+    ];
+    let background_indices = [0, 1, 3, 1, 2, 3];
+
     // Text images
     let frug_title_idx = frug_instance.load_texture(include_bytes!("img/frug_title.png"));
     let frug_title_scale = 1.0;
@@ -89,9 +120,9 @@ fn main() {
 
     // mountain
     let mount_tex_idx = frug_instance.load_texture(include_bytes!("img/mountain.png"));
-    let mount_scale = 1.0;
     let mount_w = 640.0 / window_w;
     let mount_h = 400.0 / window_h;
+    let mountains: Vec<[f32; 3]> = Vec::new();
 
     // update function
     let update_function = move |instance: &mut frug::FrugInstance, input: &frug::InputHelper| {
@@ -177,6 +208,9 @@ fn main() {
 
         // render if not in full transition
         if transition != Transition::Full {
+            // render background
+            instance.add_colored_vertices(&background, &background_indices);
+
             // render mountains
             instance.add_tex_rect(
                 -1.0,
