@@ -488,6 +488,48 @@ fn main() {
         }
         indices_to_delete.clear();
 
+        // update back mountains data
+        //      move mountains & check if should delete them
+        for i in 0..mountains_back.len() {
+            mountains_back[i][0] -= slide_transition_speed * mount_back_spd;
+
+            // check for deletion
+            if slide_transition_speed > 0.0 {
+                // to delete left
+                if mountains_back[i][0] + mount_w * mount_back_scale < -1.0 {
+                    indices_to_delete.push(i);
+                }
+            } else if slide_transition_speed < 0.0 {
+                // to delete right
+                if mountains_back[i][0] > 1.0 {
+                    indices_to_delete.push(i);
+                }
+            }
+        }
+        //      create new trees if moving
+        if slide_in_transition {
+            if slide_transition_speed > 0.0 {
+                // create on right if last tile not equal or beyond border
+                let last_mount_right =
+                    mountains_back[mountains_back.len() - 1][0] + mount_w * mount_back_scale;
+
+                if last_mount_right < 1.0 {
+                    let new_x =
+                        last_mount_right + rand::thread_rng().gen_range(gap_rng.0..gap_rng.1);
+
+                    mountains_back.push([
+                        new_x,                                       // x
+                        -1.0 + grass_h + mount_h * mount_back_scale, // y
+                    ]);
+                }
+            }
+        }
+        //      delete trees
+        for i in indices_to_delete.iter().rev() {
+            mountains_back.remove(*i);
+        }
+        indices_to_delete.clear();
+
         // ****     INPUT   ****
         if input.key_pressed(frug::VirtualKeyCode::Right) {
             // advance
