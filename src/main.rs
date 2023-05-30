@@ -23,7 +23,7 @@ fn main() {
 
     // gradient background
     let top_bkg_color = [0.205, 0.39, 1.0];
-    let bottom_bkg_color = [0.55, 0.55, 1.0];
+    let bottom_bkg_color = [0.75, 0.75, 1.0];
     let background = [
         frug::Vertex {
             // top left
@@ -71,7 +71,10 @@ fn main() {
     let mut transition_height = 1.0;
 
     // slides data
-    let slide = 0;
+    let mut slide = 0;
+    let mut slide_in_transition: bool = false;
+    let slide_speed = 0.01;
+    let mut slide_transition_speed = 0.0;
 
     // load frog textures
     let frogo_idle = vec![
@@ -105,6 +108,16 @@ fn main() {
     let grass_w = 160.0 / window_w * grass_scale;
     let grass_h = 240.0 / window_h * grass_scale;
     let grass_repeats = math::round::ceil((2.0 / grass_w) as f64, 0) as i32;
+    let grass_spd = 1.0;
+    let mut grass_tiles: Vec<[f32; 3]> = Vec::new();
+    //      init grass tiles
+    for i in 0..grass_repeats {
+        grass_tiles.push([
+            -1.0 + grass_w * i as f32, // x
+            -1.0 + grass_h,            // y
+            (i % 2) as f32,            // flip x
+        ]);
+    }
 
     // clouds
     let cloud_tex_idx = frug_instance.load_texture(include_bytes!("img/cloud1.png"));
@@ -169,16 +182,18 @@ fn main() {
 
     // trees
     let pine_tex = frug_instance.load_texture(include_bytes!("img/pine.png"));
+    let pine_front_tex = frug_instance.load_texture(include_bytes!("img/pine_front.png"));
     let pine_w = 140.0 / window_w;
     let pine_h = 270.0 / window_h;
     let pine_scale = (0.9, 1.2);
     let pine_gap = (0.005, 0.05);
     //      back forest
+    let back_forest_spd = 0.5;
     let mut back_forest: Vec<[f32; 3]> = Vec::new();
     {
         let scale = rand::thread_rng().gen_range(pine_scale.0..pine_scale.1);
         back_forest.push([
-            -1.1 + rand::thread_rng().gen_range(pine_gap.0..pine_gap.1), // x
+            -1.3 + rand::thread_rng().gen_range(pine_gap.0..pine_gap.1), // x
             -1.0 + grass_h + pine_h * scale,                             // y
             scale,                                                       // scale
         ]);
@@ -200,6 +215,37 @@ fn main() {
             break;
         }
     }
+    //      front forest
+    let front_forest_spd = 0.7;
+    let mut front_forest: Vec<[f32; 3]> = Vec::new();
+    {
+        let scale = rand::thread_rng().gen_range(pine_scale.0..pine_scale.1);
+        front_forest.push([
+            -1.1 + rand::thread_rng().gen_range(pine_gap.0..pine_gap.1), // x
+            -1.0 + grass_h + pine_h * scale,                             // y
+            scale,                                                       // scale
+        ]);
+    }
+    loop {
+        // create pines until full screen has pines
+        let last_pine = front_forest[front_forest.len() - 1];
+        let last_x = last_pine[0] + pine_w * last_pine[2];
+        let gap = rand::thread_rng().gen_range(pine_gap.0..pine_gap.1);
+        let scale = rand::thread_rng().gen_range(pine_scale.0..pine_scale.1);
+        front_forest.push([
+            last_x + gap,                    // x
+            -1.0 + grass_h + pine_h * scale, // y
+            scale,
+        ]);
+
+        // exit if this should be the last mountain to create
+        if last_x + gap + (pine_w * scale) > 1.0 {
+            break;
+        }
+    }
+
+    // indices to delete in vectors
+    let mut indices_to_delete: Vec<usize> = Vec::new();
 
     // ============= UPDATE FUNCTION =============
     let update_function = move |instance: &mut frug::FrugInstance, input: &frug::InputHelper| {
@@ -210,6 +256,9 @@ fn main() {
             transition_height -= transition_speed;
             if transition_height <= 0.0 {
                 transition = Transition::None;
+                if slide == 0 {
+                    slide = 1;
+                }
             }
         } else if transition == Transition::Intro {
             transition_height += transition_speed;
@@ -268,6 +317,133 @@ fn main() {
         }
         clouds_to_delete.clear();
 
+        // update grass data
+        //      move grass & check if should delete them
+        for i in 0..grass_tiles.len() {
+            grass_tiles[i][0] -= slide_transition_speed * grass_spd;
+
+            // check for deletion
+            if slide_transition_speed > 0.0 {
+                // to delete left
+                if grass_tiles[i][0] + grass_w * grass_scale < -1.0 {
+                    indices_to_delete.push(i);
+                }
+            } else if slide_transition_speed < 0.0 {
+                // to delete right
+                if grass_tiles[i][0] + grass_w * grass_scale > 1.0 {
+                    indices_to_delete.push(i);
+                }
+            }
+        }
+        //      create new grass tiles if moving
+        if slide_in_transition {
+            if slide_transition_speed > 0.0 {
+                // create on right if last tile not equal or beyond border
+                if grass_tiles[grass_tiles.len() - 1][0] + grass_w < 1.0 {
+                    grass_tiles.push([
+                        grass_tiles[grass_tiles.len() - 1][0] + grass_w, // x
+                        grass_tiles[grass_tiles.len() - 1][1],           // y
+                        ((grass_tiles[grass_tiles.len() - 1][2] as i32 + 1) % 2) as f32, // flip x
+                    ]);
+                }
+            }
+        }
+        //      delete grass tiles
+        for i in indices_to_delete.iter().rev() {
+            grass_tiles.remove(*i);
+        }
+        indices_to_delete.clear();
+
+        // update front forest data
+        //      move trees & check if should delete them
+        for i in 0..front_forest.len() {
+            front_forest[i][0] -= slide_transition_speed * front_forest_spd;
+
+            // check for deletion
+            if slide_transition_speed > 0.0 {
+                // to delete left
+                if front_forest[i][0] + pine_w * front_forest[i][2] < -1.0 {
+                    indices_to_delete.push(i);
+                }
+            } else if slide_transition_speed < 0.0 {
+                // to delete right
+                if front_forest[i][0] + pine_w * front_forest[i][2] > 1.0 {
+                    indices_to_delete.push(i);
+                }
+            }
+        }
+        //      create new trees if moving
+        if slide_in_transition {
+            if slide_transition_speed > 0.0 {
+                // create on right if last tile not equal or beyond border
+                let last_pine_right = front_forest[front_forest.len() - 1][0]
+                    + pine_w * front_forest[front_forest.len() - 1][2];
+
+                if last_pine_right < 1.0 {
+                    let new_scale = rand::thread_rng().gen_range(pine_scale.0..pine_scale.1);
+                    let new_x =
+                        last_pine_right + rand::thread_rng().gen_range(pine_gap.0..pine_gap.1);
+                    let new_y = -1.0 + grass_h + pine_h * new_scale;
+
+                    front_forest.push([
+                        new_x,     // x
+                        new_y,     // y
+                        new_scale, // scale
+                    ]);
+                }
+            }
+        }
+        //      delete trees
+        for i in indices_to_delete.iter().rev() {
+            front_forest.remove(*i);
+        }
+        indices_to_delete.clear();
+
+        // update back forest data
+        //      move trees & check if should delete them
+        for i in 0..back_forest.len() {
+            back_forest[i][0] -= slide_transition_speed * back_forest_spd;
+
+            // check for deletion
+            if slide_transition_speed > 0.0 {
+                // to delete left
+                if back_forest[i][0] + pine_w * back_forest[i][2] < -1.0 {
+                    indices_to_delete.push(i);
+                }
+            } else if slide_transition_speed < 0.0 {
+                // to delete right
+                if back_forest[i][0] + pine_w * back_forest[i][2] > 1.0 {
+                    indices_to_delete.push(i);
+                }
+            }
+        }
+        //      create new trees if moving
+        if slide_in_transition {
+            if slide_transition_speed > 0.0 {
+                // create on right if last tile not equal or beyond border
+                let last_pine_right = back_forest[back_forest.len() - 1][0]
+                    + pine_w * back_forest[back_forest.len() - 1][2];
+
+                if last_pine_right < 1.0 {
+                    let new_scale = rand::thread_rng().gen_range(pine_scale.0..pine_scale.1);
+                    let new_x =
+                        last_pine_right + rand::thread_rng().gen_range(pine_gap.0..pine_gap.1);
+                    let new_y = -1.0 + grass_h + pine_h * new_scale;
+
+                    back_forest.push([
+                        new_x,     // x
+                        new_y,     // y
+                        new_scale, // scale
+                    ]);
+                }
+            }
+        }
+        //      delete trees
+        for i in indices_to_delete.iter().rev() {
+            back_forest.remove(*i);
+        }
+        indices_to_delete.clear();
+
         // ****     INPUT   ****
         if input.key_pressed(frug::VirtualKeyCode::Right) {
             // advance
@@ -277,6 +453,11 @@ fn main() {
                     transition = Transition::Outro;
                     transition_height = 1.0;
                 }
+            } else if !slide_in_transition {
+                // move to next slide only if slide is static
+                slide_transition_speed = slide_speed;
+                slide_in_transition = true;
+                println!("moving slide");
             }
         }
 
@@ -326,6 +507,17 @@ fn main() {
                     false,
                 );
             }
+            for pine in front_forest.iter() {
+                instance.add_tex_rect(
+                    pine[0],
+                    pine[1],
+                    pine_w * pine[2],
+                    pine_h * pine[2],
+                    pine_front_tex,
+                    false,
+                    false,
+                );
+            }
 
             // render clouds
             for cloud in clouds_data.iter() {
@@ -341,14 +533,14 @@ fn main() {
             }
 
             // render grass
-            for i in 0..grass_repeats {
+            for tile in grass_tiles.iter() {
                 instance.add_tex_rect(
-                    -1.0 + grass_w * i as f32,
-                    -1.0 + grass_h,
+                    tile[0],
+                    tile[1],
                     grass_w,
                     grass_h,
                     grass_tex_idx,
-                    i % 2 == 0,
+                    tile[2] == 1.0,
                     false,
                 );
             }
