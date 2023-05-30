@@ -138,8 +138,10 @@ fn main() {
     let mount_h = 400.0 / window_h;
     let mut mountains_back: Vec<[f32; 2]> = Vec::new();
     let mount_back_scale = 1.1;
+    let mount_back_spd = 0.1;
     let mut mountains_front: Vec<[f32; 2]> = Vec::new();
     let mount_front_scale = 1.4;
+    let mount_front_spd = 0.15;
     let gap_rng = (0.2, 0.4);
     //      init back mountains
     mountains_back.push([
@@ -441,6 +443,48 @@ fn main() {
         //      delete trees
         for i in indices_to_delete.iter().rev() {
             back_forest.remove(*i);
+        }
+        indices_to_delete.clear();
+
+        // update front mountains data
+        //      move mountains & check if should delete them
+        for i in 0..mountains_front.len() {
+            mountains_front[i][0] -= slide_transition_speed * mount_front_spd;
+
+            // check for deletion
+            if slide_transition_speed > 0.0 {
+                // to delete left
+                if mountains_front[i][0] + mount_w * mount_front_scale < -1.0 {
+                    indices_to_delete.push(i);
+                }
+            } else if slide_transition_speed < 0.0 {
+                // to delete right
+                if mountains_front[i][0] > 1.0 {
+                    indices_to_delete.push(i);
+                }
+            }
+        }
+        //      create new trees if moving
+        if slide_in_transition {
+            if slide_transition_speed > 0.0 {
+                // create on right if last tile not equal or beyond border
+                let last_mount_right =
+                    mountains_front[mountains_front.len() - 1][0] + mount_w * mount_front_scale;
+
+                if last_mount_right < 1.0 {
+                    let new_x =
+                        last_mount_right + rand::thread_rng().gen_range(gap_rng.0..gap_rng.1);
+
+                    mountains_front.push([
+                        new_x,                                        // x
+                        -1.0 + grass_h + mount_h * mount_front_scale, // y
+                    ]);
+                }
+            }
+        }
+        //      delete trees
+        for i in indices_to_delete.iter().rev() {
+            mountains_front.remove(*i);
         }
         indices_to_delete.clear();
 
