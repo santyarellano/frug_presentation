@@ -120,11 +120,88 @@ fn main() {
 
     // mountain
     let mount_tex_idx = frug_instance.load_texture(include_bytes!("img/mountain.png"));
+    let mount2_tex_idx = frug_instance.load_texture(include_bytes!("img/mountain_dark.png"));
     let mount_w = 640.0 / window_w;
     let mount_h = 400.0 / window_h;
-    let mountains: Vec<[f32; 3]> = Vec::new();
+    let mut mountains_back: Vec<[f32; 2]> = Vec::new();
+    let mount_back_scale = 1.1;
+    let mut mountains_front: Vec<[f32; 2]> = Vec::new();
+    let mount_front_scale = 1.4;
+    let gap_rng = (0.2, 0.4);
+    //      init back mountains
+    mountains_back.push([
+        -1.4 + rand::thread_rng().gen_range(gap_rng.0..gap_rng.1), // x
+        -1.0 + grass_h + mount_h * mount_back_scale,               // y
+    ]);
+    loop {
+        // create mountains until full screen has mountains
+        let last_x = mountains_back[mountains_back.len() - 1][0] + mount_w * mount_back_scale;
+        let gap = rand::thread_rng().gen_range(gap_rng.0..gap_rng.1);
+        mountains_back.push([
+            last_x + gap,                                // x
+            -1.0 + grass_h + mount_h * mount_back_scale, // y
+        ]);
 
-    // update function
+        // exit if this should be the last mountain to create
+        if last_x + gap + (mount_w * mount_back_scale) > 1.0 {
+            break;
+        }
+    }
+    //      init front mountains
+    mountains_front.push([
+        -1.4 + rand::thread_rng().gen_range(gap_rng.0..gap_rng.1), // x
+        -1.0 + grass_h + mount_h * mount_front_scale,              // y
+    ]);
+    loop {
+        // create mountains until full screen has mountains
+        let last_x = mountains_front[mountains_front.len() - 1][0] + mount_w * mount_front_scale;
+        let gap = rand::thread_rng().gen_range(gap_rng.0..gap_rng.1);
+        mountains_front.push([
+            last_x + gap,                                 // x
+            -1.0 + grass_h + mount_h * mount_front_scale, // y
+        ]);
+
+        // exit if this should be the last mountain to create
+        if last_x + gap + (mount_w * mount_front_scale) > 1.0 {
+            break;
+        }
+    }
+
+    // trees
+    let pine_tex = frug_instance.load_texture(include_bytes!("img/pine.png"));
+    let pine_w = 140.0 / window_w;
+    let pine_h = 270.0 / window_h;
+    let pine_scale = (0.9, 1.2);
+    let pine_gap = (0.005, 0.05);
+    //      back forest
+    let mut back_forest: Vec<[f32; 3]> = Vec::new();
+    {
+        let scale = rand::thread_rng().gen_range(pine_scale.0..pine_scale.1);
+        back_forest.push([
+            -1.1 + rand::thread_rng().gen_range(pine_gap.0..pine_gap.1), // x
+            -1.0 + grass_h + pine_h * scale,                             // y
+            scale,                                                       // scale
+        ]);
+    }
+    loop {
+        // create pines until full screen has pines
+        let last_pine = back_forest[back_forest.len() - 1];
+        let last_x = last_pine[0] + pine_w * last_pine[2];
+        let gap = rand::thread_rng().gen_range(pine_gap.0..pine_gap.1);
+        let scale = rand::thread_rng().gen_range(pine_scale.0..pine_scale.1);
+        back_forest.push([
+            last_x + gap,                    // x
+            -1.0 + grass_h + pine_h * scale, // y
+            scale,
+        ]);
+
+        // exit if this should be the last mountain to create
+        if last_x + gap + (pine_w * scale) > 1.0 {
+            break;
+        }
+    }
+
+    // ============= UPDATE FUNCTION =============
     let update_function = move |instance: &mut frug::FrugInstance, input: &frug::InputHelper| {
         // ****     LOGIC   ****
 
@@ -212,15 +289,43 @@ fn main() {
             instance.add_colored_vertices(&background, &background_indices);
 
             // render mountains
-            instance.add_tex_rect(
-                -1.0,
-                -1.0 + grass_h + mount_h,
-                mount_w,
-                mount_h,
-                mount_tex_idx,
-                false,
-                false,
-            );
+            //      back mountains
+            for mount in mountains_back.iter() {
+                instance.add_tex_rect(
+                    mount[0],
+                    mount[1],
+                    mount_w * mount_back_scale,
+                    mount_h * mount_back_scale,
+                    mount2_tex_idx,
+                    false,
+                    false,
+                );
+            }
+            //      front mountains
+            for mount in mountains_front.iter() {
+                instance.add_tex_rect(
+                    mount[0],
+                    mount[1],
+                    mount_w * mount_front_scale,
+                    mount_h * mount_front_scale,
+                    mount_tex_idx,
+                    false,
+                    false,
+                );
+            }
+
+            // forests
+            for pine in back_forest.iter() {
+                instance.add_tex_rect(
+                    pine[0],
+                    pine[1],
+                    pine_w * pine[2],
+                    pine_h * pine[2],
+                    pine_tex,
+                    false,
+                    false,
+                );
+            }
 
             // render clouds
             for cloud in clouds_data.iter() {
