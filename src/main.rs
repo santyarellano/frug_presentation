@@ -386,6 +386,35 @@ fn main() {
                 tex_idx: frug_instance.load_texture(include_bytes!("img/bevy.png")),
             },
         ],
+        vec![
+            SlideObj {
+                // title
+                x: -(1445.0 / window_w * 1.0) / 2.0,
+                y: 0.85,
+                w: 1410.0 / window_w,
+                h: 200.0 / window_h,
+                scale: 1.0,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/3.png")),
+            },
+            SlideObj {
+                // bad documentation
+                x: -0.333 - (170.0 / window_w * 1.5) / 2.0,
+                y: 0.35,
+                w: 170.0 / window_w,
+                h: 200.0 / window_h,
+                scale: 1.5,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/bad_docs.png")),
+            },
+            SlideObj {
+                // abstraction extremes
+                x: 0.333 - (738.0 / window_w * 0.6) / 2.0,
+                y: 0.45,
+                w: 738.0 / window_w,
+                h: 793.0 / window_h,
+                scale: 0.6,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/abstraction_usable.png")),
+            },
+        ],
     ];
     /*let mut slides_content: Vec<Vec<SlideObj>> = Vec::new();
     slides_content.push(vec![]);*/
