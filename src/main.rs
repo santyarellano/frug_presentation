@@ -71,8 +71,17 @@ fn main() {
     frug_instance.set_window_size(window_w, window_h);
 
     // gradient background
-    let top_bkg_color = [0.205, 0.39, 1.0];
-    let bottom_bkg_color = [0.75, 0.75, 1.0];
+    let day = true;
+    let top_bkg_color = if day {
+        [0.205, 0.59, 1.0]
+    } else {
+        [0.1, 0.0, 0.05]
+    };
+    let bottom_bkg_color = if day {
+        [0.75, 0.75, 1.0]
+    } else {
+        [0.05, 0.05, 0.1]
+    };
     let background = [
         frug::Vertex {
             // top left
@@ -300,8 +309,45 @@ fn main() {
 
     // slides content
     let mut slides_data = [
-        vec![],
         vec![
+            SlideObj {
+                // title
+                x: -(1445.0 / window_w * 1.3) / 2.0,
+                y: 0.85,
+                w: 1445.0 / window_w,
+                h: 138.0 / window_h,
+                scale: 1.3,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/2.png")),
+            },
+            SlideObj {
+                // chart - popularity
+                x: -0.5 - (300.0 / window_w * 1.0) / 2.0,
+                y: 0.5,
+                w: 300.0 / window_w,
+                h: 400.0 / window_h,
+                scale: 1.0,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/chart.png")),
+            },
+            SlideObj {
+                // trophy - sdl (industry standard)
+                x: -(500.0 / window_w * 0.7) / 2.0,
+                y: 0.55,
+                w: 500.0 / window_w,
+                h: 640.0 / window_h,
+                scale: 0.7,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/sdl.png")),
+            },
+        ],
+        vec![
+            SlideObj {
+                // title
+                x: -(1255.0 / window_w * 1.5) / 2.0,
+                y: 0.85,
+                w: 1255.0 / window_w,
+                h: 138.0 / window_h,
+                scale: 1.5,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/1.png")),
+            },
             SlideObj {
                 // gamepad
                 x: -0.5 - (320.0 / window_w * 1.15) / 2.0,
@@ -320,23 +366,14 @@ fn main() {
                 scale: 1.75,
                 tex_idx: frug_instance.load_texture(include_bytes!("img/rust_crab.png")),
             },
-        ],
-        vec![
             SlideObj {
-                x: 0.0,
-                y: 0.0,
-                w: 320.0 / window_w,
-                h: 180.0 / window_h,
-                scale: 1.0,
-                tex_idx: frug_instance.load_texture(include_bytes!("img/gamepad.png")),
-            },
-            SlideObj {
-                x: 0.5,
-                y: 0.0,
-                w: 320.0 / window_w,
-                h: 180.0 / window_h,
-                scale: 1.0,
-                tex_idx: frug_instance.load_texture(include_bytes!("img/gamepad.png")),
+                // docs
+                x: 0.5 - (340.0 / window_w * 0.9) / 2.0,
+                y: 0.4,
+                w: 340.0 / window_w,
+                h: 400.0 / window_h,
+                scale: 0.9,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/docs.png")),
             },
         ],
     ];
