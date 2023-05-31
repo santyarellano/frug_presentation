@@ -10,6 +10,55 @@ enum Transition {
     None,
 }
 
+struct SlideObj {
+    x: f32,
+    y: f32,
+    w: f32,
+    h: f32,
+    scale: f32,
+    tex_idx: usize,
+}
+
+// initializes the contents of the next slide and deletes te contents of the previous one (moves to direction defined with to_right)
+/*fn create_next_slide(
+    slides_content: &mut Vec<Vec<SlideObj>>,
+    slides_data: &Vec<Vec<SlideObj>>,
+    to_right: bool,
+    current_slide: usize,
+) {
+    let x_offset = if to_right { 2.0 } else { -2.0 };
+    let next_slide = if to_right {
+        current_slide + 1
+    } else {
+        current_slide - 1
+    };
+
+    // copy data items into content (only if slide data exists)
+    if next_slide < slides_data.len() {
+        let mut new_vec: Vec<SlideObj> = Vec::new();
+        for data in slides_data[next_slide].iter() {
+            new_vec.push(SlideObj {
+                x: data.x + x_offset,
+                y: data.y,
+                w: data.w,
+                h: data.h,
+                scale: data.scale,
+                tex_idx: data.tex_idx,
+            });
+        }
+
+        slides_content.push(new_vec);
+    }
+
+    // delete previous data (if it exists)
+    if !slides_content.is_empty() {
+        let to_delete = if to_right {
+            0
+        } else {
+        };
+    }
+}*/
+
 fn main() {
     let (mut frug_instance, event_loop) = frug::new("My Window");
 
@@ -248,6 +297,59 @@ fn main() {
 
     // indices to delete in vectors
     let mut indices_to_delete: Vec<usize> = Vec::new();
+
+    // slides content
+    let mut slides_data = [
+        vec![],
+        vec![
+            SlideObj {
+                // gamepad
+                x: -0.5 - (320.0 / window_w * 1.15) / 2.0,
+                y: 0.3,
+                w: 320.0 / window_w,
+                h: 180.0 / window_h,
+                scale: 1.15,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/gamepad.png")),
+            },
+            SlideObj {
+                // rust crab
+                x: (256.0 / window_w * 1.75) / -2.0,
+                y: 0.4,
+                w: 256.0 / window_w,
+                h: 256.0 / window_h,
+                scale: 1.75,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/rust_crab.png")),
+            },
+        ],
+        vec![
+            SlideObj {
+                x: 0.0,
+                y: 0.0,
+                w: 320.0 / window_w,
+                h: 180.0 / window_h,
+                scale: 1.0,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/gamepad.png")),
+            },
+            SlideObj {
+                x: 0.5,
+                y: 0.0,
+                w: 320.0 / window_w,
+                h: 180.0 / window_h,
+                scale: 1.0,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/gamepad.png")),
+            },
+        ],
+    ];
+    /*let mut slides_content: Vec<Vec<SlideObj>> = Vec::new();
+    slides_content.push(vec![]);*/
+    let slide_movement_duration = 2.0;
+    let mut slide_movement_left = 0.0;
+    //      update x values of slides' data with offset
+    for i in 0..slides_data.len() {
+        for item in slides_data[i].iter_mut() {
+            item.x += slide_movement_duration * i as f32;
+        }
+    }
 
     // ============= UPDATE FUNCTION =============
     let update_function = move |instance: &mut frug::FrugInstance, input: &frug::InputHelper| {
@@ -542,6 +644,22 @@ fn main() {
         }
         indices_to_delete.clear();
 
+        // updates slides data position
+        for slide in slides_data.iter_mut() {
+            for item in slide.iter_mut() {
+                item.x -= slide_transition_speed;
+            }
+        }
+
+        // stop slide transition
+        if slide_in_transition {
+            slide_movement_left -= slide_speed;
+            if slide_movement_left <= 0.0 {
+                slide_in_transition = false;
+                slide_transition_speed = 0.0;
+            }
+        }
+
         // ****     INPUT   ****
         if input.key_pressed(frug::VirtualKeyCode::Right) {
             // advance
@@ -555,6 +673,7 @@ fn main() {
                 // move to next slide only if slide is static
                 slide_transition_speed = slide_speed;
                 slide_in_transition = true;
+                slide_movement_left = slide_movement_duration;
                 println!("moving slide");
             }
         }
@@ -628,6 +747,25 @@ fn main() {
                     false,
                     false,
                 );
+            }
+
+            // render slide content (if within screen)
+            for slide in slides_data.iter() {
+                for item in slide.iter() {
+                    if item.x + item.w * item.scale >= -1.0 && item.x < 1.0 {
+                        if item.y - item.h * item.scale <= 1.0 && item.y > -1.0 {
+                            instance.add_tex_rect(
+                                item.x,
+                                item.y,
+                                item.w * item.scale,
+                                item.h * item.scale,
+                                item.tex_idx,
+                                false,
+                                false,
+                            )
+                        }
+                    }
+                }
             }
 
             // render grass
