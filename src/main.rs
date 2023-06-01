@@ -500,6 +500,35 @@ fn main() {
                 tex_idx: frug_instance.load_texture(include_bytes!("img/frug_qr.png")),
             },
         ],
+        vec![
+            SlideObj {
+                // title
+                x: -(1758.0 / window_w * 1.0) / 2.0,
+                y: 0.85,
+                w: 1758.0 / window_w,
+                h: 128.0 / window_h,
+                scale: 1.0,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/6.png")),
+            },
+            SlideObj {
+                // charts
+                x: -(960.0 / window_w * 1.3) / 2.0,
+                y: 0.1 + (540.0 / window_h * 1.3) / 2.0,
+                w: 960.0 / window_w,
+                h: 540.0 / window_h,
+                scale: 1.3,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/charts.png")),
+            },
+            SlideObj {
+                // charts' frame
+                x: -(((960.0 / window_w) - 0.15) * 1.6) / 2.0,
+                y: 0.1 + (540.0 / window_h * 1.6) / 2.0,
+                w: 960.0 / window_w - 0.15,
+                h: 540.0 / window_h,
+                scale: 1.6,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/charts_frame.png")),
+            },
+        ],
     ];
     /*let mut slides_content: Vec<Vec<SlideObj>> = Vec::new();
     slides_content.push(vec![]);*/
