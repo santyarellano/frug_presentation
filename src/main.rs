@@ -415,6 +415,62 @@ fn main() {
                 tex_idx: frug_instance.load_texture(include_bytes!("img/abstraction_usable.png")),
             },
         ],
+        vec![
+            SlideObj {
+                // title
+                x: -(1389.0 / window_w * 1.2) / 2.0,
+                y: 0.85,
+                w: 1389.0 / window_w,
+                h: 224.0 / window_h,
+                scale: 1.2,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/4.png")),
+            },
+            SlideObj {
+                // gpu
+                x: -0.575 - (400.0 / window_w * 0.9) / 2.0,
+                y: 0.33,
+                w: 400.0 / window_w,
+                h: 330.0 / window_h,
+                scale: 0.9,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/gpu.png")),
+            },
+            SlideObj {
+                // +
+                x: -0.25 - (180.0 / window_w * 1.2) / 2.0,
+                y: 0.25,
+                w: 180.0 / window_w,
+                h: 180.0 / window_h,
+                scale: 1.2,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/add.png")),
+            },
+            SlideObj {
+                // good docs
+                x: 0.0 - (170.0 / window_w * 1.4) / 2.0,
+                y: 0.3,
+                w: 170.0 / window_w,
+                h: 200.0 / window_h,
+                scale: 1.4,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/good_docs.png")),
+            },
+            SlideObj {
+                // =
+                x: 0.27 - (180.0 / window_w * 1.2) / 2.0,
+                y: 0.25,
+                w: 180.0 / window_w,
+                h: 180.0 / window_h,
+                scale: 1.2,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/equal.png")),
+            },
+            SlideObj {
+                // frug
+                x: 0.56 - (192.0 / window_w * 1.9) / 2.0,
+                y: 0.37,
+                w: 192.0 / window_w,
+                h: 192.0 / window_h,
+                scale: 1.9,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/frog_idle/1.png")),
+            },
+        ],
     ];
     /*let mut slides_content: Vec<Vec<SlideObj>> = Vec::new();
     slides_content.push(vec![]);*/
