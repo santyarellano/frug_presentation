@@ -471,6 +471,35 @@ fn main() {
                 tex_idx: frug_instance.load_texture(include_bytes!("img/frog_idle/1.png")),
             },
         ],
+        vec![
+            SlideObj {
+                // title
+                x: -(1577.0 / window_w * 1.0) / 2.0,
+                y: 0.85,
+                w: 1577.0 / window_w,
+                h: 224.0 / window_h,
+                scale: 1.0,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/5.png")),
+            },
+            SlideObj {
+                // docs screenshot
+                x: -0.45 - (1610.0 / window_w * 0.5) / 2.0,
+                y: 0.45,
+                w: 1610.0 / window_w,
+                h: 1332.0 / window_h,
+                scale: 0.5,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/frug_docs_ss.png")),
+            },
+            SlideObj {
+                // docs qr
+                x: 0.4 - (1023.0 / window_w * 0.6) / 2.0,
+                y: 0.45,
+                w: 1023.0 / window_w,
+                h: 1023.0 / window_h,
+                scale: 0.6,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/frug_qr.png")),
+            },
+        ],
     ];
     /*let mut slides_content: Vec<Vec<SlideObj>> = Vec::new();
     slides_content.push(vec![]);*/
