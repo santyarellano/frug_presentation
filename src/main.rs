@@ -483,7 +483,7 @@ fn main() {
             },
             SlideObj {
                 // docs screenshot
-                x: -0.45 - (1610.0 / window_w * 0.5) / 2.0,
+                x: -0.35 - (1610.0 / window_w * 0.5) / 2.0,
                 y: 0.45,
                 w: 1610.0 / window_w,
                 h: 1332.0 / window_h,
@@ -492,7 +492,7 @@ fn main() {
             },
             SlideObj {
                 // docs qr
-                x: 0.4 - (1023.0 / window_w * 0.6) / 2.0,
+                x: 0.45 - (1023.0 / window_w * 0.6) / 2.0,
                 y: 0.45,
                 w: 1023.0 / window_w,
                 h: 1023.0 / window_h,
