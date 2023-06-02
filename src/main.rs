@@ -550,6 +550,26 @@ fn main() {
                 tex_idx: frug_instance.load_texture(include_bytes!("img/hereafter.png")),
             },
         ],
+        vec![
+            SlideObj {
+                // meme
+                x: -(909.0 / window_w * 1.5) / 2.0,
+                y: 0.65,
+                w: 909.0 / window_w,
+                h: 499.0 / window_h,
+                scale: 1.5,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/pixel_meme.png")),
+            },
+            SlideObj {
+                // frame
+                x: -(960.0 / window_w * 1.6) / 2.0,
+                y: 0.675,
+                w: 960.0 / window_w,
+                h: 540.0 / window_h,
+                scale: 1.6,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/charts_frame.png")),
+            },
+        ],
     ];
     let slide_movement_duration = 1.999;
     let mut slide_movement_left = 0.0;
@@ -883,7 +903,6 @@ fn main() {
                 slide_transition_speed = slide_speed;
                 slide_in_transition = true;
                 slide_movement_left = slide_movement_duration;
-                println!("moving slide");
             }
         }
 
