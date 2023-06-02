@@ -66,9 +66,10 @@ fn main() {
     frug_instance.set_background_color(frug::create_color(0.205, 0.39, 1.0, 1.0));
 
     // window data
-    let window_w = 1000.0;
+    let window_w = 1200.0;
     let window_h = 800.0;
-    frug_instance.set_window_size(window_w, window_h);
+    //frug_instance.set_window_size(window_w, window_h);
+    frug_instance.set_fullscreen(true);
 
     // gradient background
     let day = true;
@@ -309,26 +310,7 @@ fn main() {
 
     // slides content
     let mut slides_data = [
-        vec![
-            SlideObj {
-                // title
-                x: -(1580.0 / window_w * 1.15) / 2.0,
-                y: 0.85,
-                w: 1580.0 / window_w,
-                h: 192.0 / window_h,
-                scale: 1.15,
-                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/7.png")),
-            },
-            SlideObj {
-                // book
-                x: -(1520.0 / window_w * 0.7) / 2.0,
-                y: 0.2 + (840.0 / window_w * 0.7) / 2.0,
-                w: 1520.0 / window_w,
-                h: 840.0 / window_h,
-                scale: 0.7,
-                tex_idx: frug_instance.load_texture(include_bytes!("img/hereafter.png")),
-            },
-        ],
+        vec![],
         vec![
             SlideObj {
                 // title
@@ -548,10 +530,28 @@ fn main() {
                 tex_idx: frug_instance.load_texture(include_bytes!("img/charts_frame.png")),
             },
         ],
+        vec![
+            SlideObj {
+                // title
+                x: -(1580.0 / window_w * 1.15) / 2.0,
+                y: 0.85,
+                w: 1580.0 / window_w,
+                h: 192.0 / window_h,
+                scale: 1.15,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/7.png")),
+            },
+            SlideObj {
+                // book
+                x: -(1520.0 / window_w * 0.7) / 2.0,
+                y: 0.2 + (840.0 / window_w * 0.7) / 2.0,
+                w: 1520.0 / window_w,
+                h: 840.0 / window_h,
+                scale: 0.7,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/hereafter.png")),
+            },
+        ],
     ];
-    /*let mut slides_content: Vec<Vec<SlideObj>> = Vec::new();
-    slides_content.push(vec![]);*/
-    let slide_movement_duration = 2.0;
+    let slide_movement_duration = 1.999;
     let mut slide_movement_left = 0.0;
     //      update x values of slides' data with offset
     for i in 0..slides_data.len() {
