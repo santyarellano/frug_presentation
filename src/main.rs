@@ -116,6 +116,10 @@ fn main() {
     let frug_title_scale = 1.0;
     let frug_title_w = 1155.0 / window_w * frug_title_scale;
     let frug_title_h = 376.0 / window_w * frug_title_scale;
+    let starring = frug_instance.load_texture(include_bytes!("img/starring.png"));
+    let starring_scale = 0.8;
+    let starring_w = 1791.0 / window_w * starring_scale;
+    let starring_h = 150.0 / window_h * starring_scale;
 
     // transition data
     let tborder_tex_idx =
@@ -1079,7 +1083,18 @@ fn main() {
                 frug_title_idx,
                 false,
                 false,
-            )
+            );
+
+            // starring frogo baggins
+            instance.add_tex_rect(
+                0.0 - starring_w / 2.0,
+                -1.0 + transition_height - 0.25,
+                starring_w,
+                starring_h,
+                starring,
+                false,
+                false,
+            );
         }
 
         instance.update_buffers();
