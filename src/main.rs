@@ -309,7 +309,26 @@ fn main() {
 
     // slides content
     let mut slides_data = [
-        vec![],
+        vec![
+            SlideObj {
+                // title
+                x: -(1580.0 / window_w * 1.15) / 2.0,
+                y: 0.85,
+                w: 1580.0 / window_w,
+                h: 192.0 / window_h,
+                scale: 1.15,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/slide_titles/7.png")),
+            },
+            SlideObj {
+                // book
+                x: -(1520.0 / window_w * 0.7) / 2.0,
+                y: 0.2 + (840.0 / window_w * 0.7) / 2.0,
+                w: 1520.0 / window_w,
+                h: 840.0 / window_h,
+                scale: 0.7,
+                tex_idx: frug_instance.load_texture(include_bytes!("img/hereafter.png")),
+            },
+        ],
         vec![
             SlideObj {
                 // title
